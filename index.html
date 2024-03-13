@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Site Behavior tags -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Basic site info-->
+    <meta name="title" data-hid="title" content="">
+    <meta name="description" data-hid="description" content="">
+
+    <!-- Open Graph (Facebook/Linkedin) tags -->
+    <!-- Testing tool: https://developers.facebook.com/tools/debug/ -->
+    <meta property="og:site_name" content="">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:url" content="http://">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="">
+    <meta property="og:description" content="">
+    <meta property="og:image" content="">
+
+    <!-- Twitter tags -->
+    <!-- Testing tool: https://cards-dev.twitter.com/validator -->
+    <meta name="twitter:site" content="http://">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:image" content="">
+    <meta name="twitter:image:alt" content="">
+    <title>Vue Template | spaghet</title>
+    
+    <!-- Inline SVG Emoji Icon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-toast-notification@2"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/vue-toast-notification@2/dist/theme-sugar.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
+</head>
+<body>
+    <div id="app">
+        <div class="dates">
+            <span>{{ date }}</span>
+            <span v-for="(m, i) of months" :key="i">
+                <span v-for="(d, j) in 31" :key="j">
+                    <span class="d" v-if="hasDay(m + 1, d)" :data-date="`${date}-${m+1}-${d}`" :class="{ 'is-today': isToday(m+1, d), 'has-passed': hasPassed(m+1, d), 'important': isImportant(m+1, d)}">&nbsp;</span>
+                </span>
+            </span>
+        </div>
+        <footer><a href="https://www.spaghet.me">Made by tones 👨🏻</a></footer>
+    </div>
+    <script>
+        const app = Vue.createApp({
+            el: '#app',
+            data() {
+                return {
+                    message: 'Hehe',
+                    date: '2024',
+                    months: [0,1,2,3,4,5,6,7,8,9,10,11],
+                }
+            },
+            mounted() {
+                const year = new URLSearchParams(window.location.search).get('year')
+                if (year.length === 4 && new Date().setUTCFullYear(Number(year)) != 'Invalid Date') {
+                    this.date = String(year);
+                }
+            },
+            methods: {
+                isToday(m, d) {
+                    const date = new Date(`${this.date}-${m}-${d}`);
+                    return date.getUTCDate() === new Date().getUTCDate() && date.getUTCMonth() === new Date().getUTCMonth();
+                },
+                hasDay(m, d) {
+                    const date = new Date(`${this.date}-${m}-${d}`);
+                    console.log(`${this.date}-${m}-${d}`, m, date.getUTCMonth() + 1)
+                    return date.getUTCMonth() + 1 === m
+                },
+                hasPassed(m, d) {
+                    console.log(new Date().getTime(), new Date(`${this.date}-${m}-${d}`).getTime())
+                    return new Date(`${this.date}-${m}-${d}`).getTime() < new Date().getTime();
+                },
+                isImportant(m, d) {
+                    const p = new Date(`${this.date}-${m}-${d}`)
+                    if (p.getUTCMonth() === 5 && p.getUTCDate() === 10 && p.getUTCFullYear() === 2024) {
+                        return true
+                    }
+
+                    return false
+                }
+            }
+        })
+        app.use(VueToast)
+        app.mount('#app');
+    </script>
+    <style>
+        .row {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .row > * {
+            padding: 0.75rem 0.25rem;
+        }
+
+        .d {
+            height: 12px;
+            width: 12px;
+            background-color: white;
+            display: inline-block;
+            margin: 1px;
+            border: 1px solid whitesmoke;
+            vertical-align: sub;
+            position: relative;
+            z-index: 2;
+            cursor: help;
+        }
+
+        .d:hover::after {
+            position: absolute;
+            left: -250%;
+            top: -225%;
+            content: '' attr(data-date) '';
+            color: white;
+            font-size: 10px;
+            text-align: center;
+            padding: 3px;
+            background-color: black;
+            width: 70px;
+            z-index: 999999999999;
+            border: none;
+            box-shadow: 1px 1px 4px #00000035;
+            border-radius: 3px;
+        }
+
+        .is-today {
+            background-color: blue;
+
+        }
+
+        .has-passed {
+            background-color: springgreen;
+            box-shadow: inset 1px 1px 2px 1px #00000025;
+        }
+
+        .important {
+            background-color: red;
+        }
+
+        input {
+            flex: 1 1 auto;
+            font-family: monospace;
+            margin: 0;
+        }
+
+        button {
+            flex: 0 1 100px;
+        }
+
+        footer {
+            text-align: center;
+        }
+
+        @media screen and (max-width: 650px) {
+            .row {
+                display: block;
+            }
+
+            .row > * {
+                width: 100%;
+                margin: 1rem 0;
+            }
+        }
+    </style>
+</body>
+</html>
